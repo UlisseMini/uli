@@ -1,4 +1,9 @@
 #!/bin/bash
 
+if ! [[ :$PATH: == *:*".local/bin":* ]] ; then
+	echo "Go add ~/.local/bin to your \$PATH you grongo"
+	exit 1
+fi
+
 cp -rvf "$(realpath pkgs)" ~/.uli_pkgs
 ln -f "$(realpath uli)" ~/.local/bin
