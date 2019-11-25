@@ -1,7 +1,12 @@
 #!/bin/bash
+set -e
 
-mkdir sl-src
-wget -O- https://github.com/mtoyoda/sl/archive/5.02.tar.gz | tar xvz -C sl-src --strip-components=1
+mkdir -p sl-src
+echo Downloading sl source code from https://github.com/mtoyoda/sl/archive/5.02.tar.gz
+wget -qO- https://github.com/mtoyoda/sl/archive/5.02.tar.gz | tar xz -C sl-src --strip-components=1
 
-make -C sl-src
+echo Compiling
+make -s -C sl-src
+
+echo Moving to ~/.local/bin
 cp -v sl-src/sl ~/.local/bin/
