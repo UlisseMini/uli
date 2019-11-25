@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp -rvf "$(realpath pkgs)" ~/.uli_pkgs
+ln -f "$(realpath uli)" ~/.local/bin

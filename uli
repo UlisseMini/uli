@@ -1,0 +1,65 @@
+#!/bin/bash
+# Main script that does crap
+
+changedir() {
+	cd "$*" || {
+		echo "Failed to cd to $*"
+		exit 1
+	}
+}
+
+# installs $1
+install() {
+	if ! [ -f "$HOME/.uli_pkgs/$1" ]; then
+		echo "Package $1 Not found."
+	else
+		echo "Installing $1..."
+		echo ------------------------------------------------------------------------
+
+		local dir
+		dir="$(mktemp -d)"
+		changedir "$dir"
+
+		"$HOME/.uli_pkgs/$1"
+		local code=$?
+
+		if [ $code = 0 ]; then
+			echo "Installation for $1 finished!, no error reported."
+		else
+			echo "Installation for $1 failed!, error code $code"
+		fi
+	fi
+}
+
+# update local package index from github
+update() {
+	local dir; dir=$(mktemp -d)
+	git clone --depth 1 "https://github.com/UlisseMini/uli" "$dir"
+	cp -rvf "$dir/pkgs" ~/.uli_pkgs
+}
+
+# upgrade local packages
+upgrade() {
+	echo "Not implemented!"; exit 1
+}
+
+help() {
+	cat <<EOF
+	Usage: uli <command> [options...]
+
+	install <package> [packages...] -- install a package
+	update                          -- update the local package index
+	upgrade                         -- upgrade/update local packages
+EOF
+}
+
+case "$1" in
+	install) install "$2" ;;
+	isntall) install "$2" ;;
+	i)       install "$2" ;;
+
+	update)  update  ;;
+	upgrade) upgrade ;;
+
+	*) help ;;
+esac
