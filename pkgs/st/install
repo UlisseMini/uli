@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+set -e
+
+if ! [ -d st-master ]; then
+	dl-extract https://github.com/LukeSmithxyz/st/archive/master.zip st-master.zip st-master
+fi
+
+cd st-master
+
+echo Compiling...
+make -s
+
+PREFIX=/usr/local
+MANPREFIX=$PREFIX/share/man
+
+echo Installing...
+cp -f st ~/.local/bin
+cp -f st-copyout ~/.local/bin
+chmod +x ~/.local/bin/st
+chmod +x ~/.local/bin/st-copyout
+mkdir -p $MANPREFIX/man1
+sudo sh <<EOF
+sed "s/VERSION/0.1.0/g" < st.1 > $MANPREFIX/man1/st.1
+chmod 644 $MANPREFIX/man1/st.1
+tic -sx st.info
+EOF
+echo Please see https://github.com/LukeSmithxyz/st/blob/master/README.md file regarding the terminfo entry of st.

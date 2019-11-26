@@ -5,6 +5,12 @@ set -e
 # Env variables used by installation scripts.
 export PATH="$PATH:$HOME/.uli/utils"
 
+init() {
+	if ! has pv; then
+		echo "NOTE: Please consider installing 'pv' for progressbars while downloading"
+	fi
+}
+
 ensure_found() {
 	if ! [ -d "$HOME/.uli/pkgs/$1" ]; then
 		echo "Package $1 Not found." >&2
@@ -67,14 +73,22 @@ remove_single() {
 
 help() {
 	cat <<EOF
-	Usage: uli <command> [options...]
+Usage: uli <command> [options...]
 
+Commands:
 	install <package> [packages...] -- install a package
 	update                          -- update the local package index
 	upgrade                         -- upgrade/update local packages
 	remove  <package> [packages...] -- remove/uninstall packages
 EOF
 }
+
+init
+
+if [ -z "$1" ]; then
+	help
+	exit 0
+fi
 
 cmd="$1"
 shift

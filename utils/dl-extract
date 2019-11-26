@@ -6,15 +6,27 @@
 #  $3 = Out dir name
 set -e
 
-ensure tar tee mkdir
-
 case "$1" in
 	*.tar.gz) extract="tar xz" ;;
 	*.tgz)    extract="tar xz" ;;
 	*.tar)    extract="tar x"  ;;
+	*.zip)    extract="unzip"  ;;
 
 	*) echo "Unknown extension for url $1"; exit 1 ;;
 esac
+
+# NOTE: Currently we do not support $3 with unzip
+if [ "$extract" = unzip ]; then
+	if has pv; then
+		dl "$1" | pv > "$2"
+		unzip -qq "$2"
+	else
+		dl "$1" > "$2"
+		unzip -qq "$2"
+	fi
+
+	exit
+fi
 
 # I want mkdir to fail if the dir exists
 mkdir "$3"

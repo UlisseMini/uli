@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+PREFIX=/usr/local
+MANPREFIX=$PREFIX/share/man
+
+rm -vf ~/.local/bin/st-copyout ~/.local/bin/st
+
+sudo rm -vf $MANPREFIX/man1/st.1
