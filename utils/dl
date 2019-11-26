@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+# Download a file from the url $1 to stdout.
+# This will use curl or wget depending on what is installed.
+
+if has curl; then
+	exec curl -sSL "$1"
+fi
+
+# Note: -q for wget also silences errors, this would be hard to debug
+# TODO: Find out how to have wget be silent but still report errors
+if has wget; then
+	exec wget -qO- "$1"
+fi
+
+echo "Failed to find a url downloader, Install curl or wget!" >&2

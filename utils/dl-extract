@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+# Download an archive, extracting at the same time as downloading.
+# Args
+#  $1 = URL
+#  $2 = Out file name
+#  $3 = Out dir name
+set -e
+
+ensure tar tee mkdir
+
+case "$1" in
+	*.tar.gz) extract="tar xz" ;;
+	*.tgz)    extract="tar xz" ;;
+	*.tar)    extract="tar x"  ;;
+
+	*) echo "Unknown extension for url $1"; exit 1 ;;
+esac
+
+# I want mkdir to fail if the dir exists
+mkdir "$3"
+
+# Download it :)
+if has pv; then
+	dl "$1" | pv | tee "$2" | $extract -C "$3" --strip-components=1
+else
+	dl "$1" | tee "$2" | ${extract}v  -C "$3" --strip-components=1
+fi
+

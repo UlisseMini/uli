@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Ensure all programs in $@ are installed.
+
+for program in "$@"; do
+	if ! command -v "$program" >/dev/null; then
+		echo "Could not find executeable '$program' in PATH!" >&2
+		exit 1
+	fi
+done
+

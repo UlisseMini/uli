@@ -1,9 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! [[ :$PATH: == *:*".local/bin":* ]] ; then
 	echo "Go add ~/.local/bin to your \$PATH you grongo"
 	exit 1
 fi
 
-cp -rvf "$(realpath pkgs)" ~/.uli_pkgs
+rm -rf ~/.uli/
+
+mkdir -p ~/.uli
+mkdir -p ~/.uli/cache
+
+cp -rvf "$(realpath pkgs)" ~/.uli/pkgs
+cp -rvf "$(realpath utils)" ~/.uli/utils
 ln -f "$(realpath uli)" ~/.local/bin

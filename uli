@@ -1,46 +1,68 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # Main script that does crap
+set -e
 
-changedir() {
-	cd "$*" || {
-		echo "Failed to cd to $*"
+# Env variables used by installation scripts.
+export PATH="$PATH:$HOME/.uli/utils"
+
+ensure_found() {
+	if ! [ -d "$HOME/.uli/pkgs/$1" ]; then
+		echo "Package $1 Not found." >&2
 		exit 1
-	}
+	fi
 }
 
-# installs $1
-install() {
-	if ! [ -f "$HOME/.uli_pkgs/$1" ]; then
-		echo "Package $1 Not found."
+install_single() {
+	ensure_found "$1"
+
+	mkdir -p "$HOME/.uli/cache/$1"
+	cd "$HOME/.uli/cache/$1"
+
+	"$HOME/.uli/pkgs/$1/install"
+	code=$?
+
+	if [ $code = 0 ]; then
+		echo "Installation for $1 finished!, no error reported."
 	else
-		echo "Installing $1..."
-		echo ------------------------------------------------------------------------
-
-		local dir
-		dir="$(mktemp -d)"
-		changedir "$dir"
-
-		"$HOME/.uli_pkgs/$1"
-		local code=$?
-
-		if [ $code = 0 ]; then
-			echo "Installation for $1 finished!, no error reported."
-		else
-			echo "Installation for $1 failed!, error code $code"
-		fi
+		echo "Installation for $1 failed!, error code $code"
 	fi
+
+	unset code
+	unset dir
+}
+
+# installs $@
+install() {
+	for pkg in "$@"; do
+		install_single "$pkg"
+	done
 }
 
 # update local package index from github
 update() {
-	local dir; dir=$(mktemp -d)
+	dir=$(mktemp -d)
 	git clone --depth 1 "https://github.com/UlisseMini/uli" "$dir"
-	cp -rvf "$dir/pkgs" ~/.uli_pkgs
+	cp -rvf "$dir/pkgs" ~/.uli/pkgs
+	unset dir
 }
 
 # upgrade local packages
 upgrade() {
 	echo "Not implemented!"; exit 1
+}
+
+remove() {
+	for pkg in "$@"; do
+		remove_single "$pkg"
+	done
+}
+
+remove_single() {
+	ensure_found "$1"
+	mkdir -p "$HOME/.uli/cache/$1"
+	cd "$HOME/.uli/cache/$1"
+
+	"$HOME/.uli/pkgs/$1/remove"
 }
 
 help() {
@@ -50,16 +72,24 @@ help() {
 	install <package> [packages...] -- install a package
 	update                          -- update the local package index
 	upgrade                         -- upgrade/update local packages
+	remove  <package> [packages...] -- remove/uninstall packages
 EOF
 }
 
-case "$1" in
-	install) install "$2" ;;
-	isntall) install "$2" ;;
-	i)       install "$2" ;;
+cmd="$1"
+shift
+
+case "$cmd" in
+	install) install $@ ;;
+	isntall) install $@ ;;
+	i)       install $@ ;;
 
 	update)  update  ;;
 	upgrade) upgrade ;;
+
+	uninstall) remove $@ ;;
+	remove)    remove $@ ;;
+	r)         remove $@ ;;
 
 	*) help ;;
 esac

@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+set -e
+
+if [ -d sl-src ]; then
+	echo Source code found in cache!
+else
+	echo Downloading sl source code from https://github.com/mtoyoda/sl/archive/5.02.tar.gz
+	dl-extract https://github.com/mtoyoda/sl/archive/5.02.tar.gz sl-src.tar.gz sl-src
+fi
+
+echo Compiling...
+make -s -C sl-src
+
+echo Installing binaries to ~/.local/bin
+cp -v sl-src/sl ~/.local/bin/
